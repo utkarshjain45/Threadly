@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: threadly-user-authentication
+  profiles:
+    active: local
+
+server:
+  port: 8081
+

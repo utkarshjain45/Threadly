@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: threadly-product-service
+
+server:
+  port: 8082
+
