@@ -11,10 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { signUpInit } from "@/api/apis";
+
+type SignUpLocationState = {
+  email?: string;
+  name?: string;
+  showOtp?: boolean;
+  message?: string;
+};
 
 export function SignUp() {
   const [name, setName] = useState("");
@@ -25,6 +32,38 @@ export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const { verifySignup } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectToOtpStep = ({
+    userEmail,
+    userName,
+    message,
+  }: {
+    userEmail: string;
+    userName?: string;
+    message: string;
+  }) => {
+    setEmail(userEmail);
+    if (userName) {
+      setName(userName);
+    }
+    setShowOtpInput(true);
+    toast.info(message);
+  };
+
+  useEffect(() => {
+    const state = location.state as SignUpLocationState | null;
+    if (state?.showOtp && state.email) {
+      redirectToOtpStep({
+        userEmail: state.email,
+        userName: state.name,
+        message:
+          state.message ??
+          "Complete your signup by entering the OTP sent to your email.",
+      });
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const handleSignUpInit = async () => {
     try {
@@ -39,8 +78,20 @@ export function SignUp() {
       }
 
       setIsLoading(true);
-      await signUpInit({ name, email, password });
-      toast.success("OTP sent to your email. Please check your inbox.");
+      const response = await signUpInit({ name, email, password });
+      const { status, message, email: responseEmail, name: responseName } =
+        response.data;
+
+      if (status === "PENDING_VERIFICATION") {
+        redirectToOtpStep({
+          userEmail: responseEmail,
+          userName: responseName,
+          message,
+        });
+        return;
+      }
+
+      toast.success(message || "OTP sent to your email. Please check your inbox.");
       setShowOtpInput(true);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to send OTP. Please try again.");
@@ -58,18 +109,25 @@ export function SignUp() {
       }
 
       setIsLoading(true);
-      const success = await verifySignup({ email, otp });
-      if (success) {
-        toast.success("Account created successfully! Welcome to Threadly");
-        navigate("/dashboard");
-      } else {
-        toast.error("Signup verification failed. Please try again.");
-      }
+      await verifySignup({ email, otp });
+      toast.success("Account created successfully! Welcome to Threadly");
+      navigate("/");
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Invalid OTP. Please try again.");
+      toast.error(
+        error?.response?.data?.message || "Invalid OTP. Please try again."
+      );
       console.error("OTP verification error:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFormSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (showOtpInput) {
+      handleOtpVerify();
+    } else {
+      handleSignUpInit();
     }
   };
 
@@ -79,7 +137,9 @@ export function SignUp() {
         <CardHeader>
           <CardTitle>Sign up to threadly</CardTitle>
           <CardDescription>
-            Enter your name, email below to signup on threadly
+            {showOtpInput
+              ? "Enter the OTP sent to your email to complete signup"
+              : "Enter your name, email below to signup on threadly"}
           </CardDescription>
           <CardAction>
             <Link to="/signin">
@@ -88,7 +148,7 @@ export function SignUp() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleFormSubmit}>
             <div className="flex flex-col gap-6">
               {!showOtpInput ? (
                 <>
@@ -145,7 +205,7 @@ export function SignUp() {
                       maxLength={6}
                     />
                     <p className="text-sm text-muted-foreground">
-                      We've sent an OTP to {email}
+                      Enter the OTP sent to {email}
                     </p>
                   </div>
                 </>
@@ -158,7 +218,7 @@ export function SignUp() {
             <>
               <Button 
                 onClick={handleSignUpInit} 
-                type="button" 
+                type="submit" 
                 className="w-full"
                 disabled={isLoading}
               >
@@ -168,7 +228,8 @@ export function SignUp() {
                 variant="outline" 
                 className="w-full" 
                 onClick={() => {
-                  window.location.href = "http://localhost:8080/oauth2/authorization/google";
+                  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+                  window.location.href = `${baseUrl}/oauth2/authorization/google`;
                 }}>
                 Continue with Google
               </Button>
@@ -177,7 +238,7 @@ export function SignUp() {
             <>
               <Button 
                 onClick={handleOtpVerify} 
-                type="button" 
+                type="submit" 
                 className="w-full"
                 disabled={isLoading}
               >

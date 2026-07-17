@@ -1,8 +1,12 @@
+import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { Banner, CategoryBanner } from "@/components/ui/banner";
 import { ProductCard } from "@/components/ui/product-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { getProductsData } from "@/api/apis";
+import type { Product } from "@/types/product";
 import {
   Star,
   Truck,
@@ -16,96 +20,59 @@ import {
 } from "lucide-react";
 
 const Home = () => {
-  // Sample data for products
-  const featuredProducts = [
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      price: 199.99,
-      originalPrice: 249.99,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
-      rating: 4.8,
-      reviews: 124,
-      badge: "Best Seller",
-      isOnSale: true,
-    },
-    {
-      id: "2",
-      name: "Smart Fitness Watch",
-      price: 299.99,
-      image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop",
-      rating: 4.6,
-      reviews: 89,
-      badge: "New",
-      isNew: true,
-    },
-    {
-      id: "3",
-      name: "Professional Camera Lens",
-      price: 899.99,
-      originalPrice: 1099.99,
-      image:
-        "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=300&fit=crop",
-      rating: 4.9,
-      reviews: 67,
-      isOnSale: true,
-    },
-    {
-      id: "4",
-      name: "Gaming Mechanical Keyboard",
-      price: 149.99,
-      image:
-        "https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=400&h=300&fit=crop",
-      rating: 4.7,
-      reviews: 156,
-    },
-    {
-      id: "5",
-      name: "Bluetooth Speaker",
-      price: 79.99,
-      originalPrice: 99.99,
-      image:
-        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=300&fit=crop",
-      rating: 4.5,
-      reviews: 203,
-      isOnSale: true,
-    },
-    {
-      id: "6",
-      name: "Wireless Mouse",
-      price: 49.99,
-      image:
-        "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop",
-      rating: 4.4,
-      reviews: 178,
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getProductsData();
+        const maybeProducts =
+          response.data?.data ?? response.data?.products ?? response.data;
+
+        if (Array.isArray(maybeProducts)) {
+          setProducts(maybeProducts);
+        }
+      } catch (err) {
+        console.error("Failed to fetch products for home page:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const featuredProducts = products.slice(0, 8);
 
   const categories = [
     {
       name: "Electronics",
+      slug: "electronics",
       image:
         "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=400&fit=crop",
       icon: Smartphone,
     },
     {
       name: "Fashion",
+      slug: "fashion",
       image:
         "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop",
       icon: Shirt,
     },
     {
-      name: "Home & Garden",
+      name: "Beauty",
+      slug: "beauty",
       image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=400&fit=crop",
       icon: Heart,
     },
     {
-      name: "Sports",
+      name: "Home Appliances",
+      slug: "home-appliances",
       image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
       icon: Zap,
     },
   ];
@@ -114,7 +81,7 @@ const Home = () => {
     {
       icon: Truck,
       title: "Free Shipping",
-      description: "Free delivery on orders over $50",
+      description: "Free delivery on orders over ₹499",
     },
     {
       icon: Shield,
@@ -142,7 +109,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <Banner
             title="Discover Amazing Products"
-            subtitle="New Collection 2024"
+            subtitle="New Collection 2026"
             description="Shop the latest trends and discover products that fit your lifestyle. Quality guaranteed with fast shipping."
             buttonText="Shop Now"
             buttonLink="/products"
@@ -169,7 +136,7 @@ const Home = () => {
                 <CategoryBanner
                   title={category.name}
                   image={category.image}
-                  link={`/categories/${category.name.toLowerCase()}`}
+                  link={`/categories/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}`}
                 />
               </div>
             ))}
@@ -208,13 +175,47 @@ const Home = () => {
                 Discover our most popular and trending items
               </p>
             </div>
-            <Button variant="outline">View All Products</Button>
+            <Button variant="outline" asChild>
+              <Link to="/products">View All Products</Link>
+            </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
+
+          {isLoading && (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+
+          {!isLoading && featuredProducts.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200/80 p-8">
+              <p className="text-gray-500 text-sm font-medium">No featured products available right now.</p>
+            </div>
+          )}
+
+          {!isLoading && featuredProducts.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.discount}
+                  image={product.images?.[0] ?? ""}
+                  rating={product.rating}
+                  reviews={product.ratingCount ?? product.rating_count ?? 0}
+                  category={String(product.category)}
+                  subcategory={product.subcategory}
+                  color={product.color}
+                  size={product.size}
+                  bestSeller={product.bestSeller}
+                  newArrival={product.newArrival}
+                  brand={product.brand}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -236,9 +237,11 @@ const Home = () => {
                 Join thousands of satisfied customers and save on your first
                 purchase. Use code WELCOME20 at checkout.
               </p>
-              <Button size="lg" variant="secondary">
-                Shop Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild size="lg" variant="secondary">
+                <Link to="/products">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -345,7 +348,7 @@ const Home = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Threadly. All rights reserved.</p>
+            <p>&copy; 2026 Threadly. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -1,5 +1,10 @@
 import { signIn, getUserData, signUp, signUpVerify } from "@/api/apis";
-import type { SignInRequest, SignUpRequest, SignUpVerifyRequest } from "@/types/auth";
+import type {
+  LoginResult,
+  SignInRequest,
+  SignUpRequest,
+  SignUpVerifyRequest,
+} from "@/types/auth";
 import type { UserSession } from "@/types/user-session";
 import type { User } from "@/types/user";
 import {
@@ -16,7 +21,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
 
-  login: (signInRequest: SignInRequest) => Promise<boolean>;
+  login: (signInRequest: SignInRequest) => Promise<LoginResult>;
   signup: (signUpRequest: SignUpRequest) => Promise<boolean>;
   verifySignup: (verifyRequest: SignUpVerifyRequest) => Promise<boolean>;
   logout: () => void;
@@ -64,17 +69,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("userSession", JSON.stringify({ token }));
   };
 
-  const login = async (signInRequest: SignInRequest): Promise<boolean> => {
-    try {
-      const response = await signIn(signInRequest);
-      const { token } = response.data;
-      setUserSession({ token });
-      localStorage.setItem("userSession", JSON.stringify({ token }));
+  const login = async (signInRequest: SignInRequest): Promise<LoginResult> => {
+    const response = await signIn(signInRequest);
+    const data = response.data;
 
-      return true;
-    } catch (error) {
-      throw error;
+    if (data.status === "PENDING_VERIFICATION") {
+      return {
+        status: "pendingVerification",
+        email: data.email ?? signInRequest.email,
+        name: data.name,
+        message: data.message,
+      };
     }
+
+    const token = data.token;
+    if (!token) {
+      throw new Error("Login failed");
+    }
+
+    setUserSession({ token });
+    localStorage.setItem("userSession", JSON.stringify({ token }));
+
+    return { status: "success" };
   };
   
   const signup = async (signUpRequest: SignUpRequest): Promise<boolean> => {
@@ -91,16 +107,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const verifySignup = async (verifyRequest: SignUpVerifyRequest): Promise<boolean> => {
-    try {
-      const response = await signUpVerify(verifyRequest);
-      const { token } = response.data;
-      setUserSession({ token });
-      localStorage.setItem("userSession", JSON.stringify({ token }));
+    const response = await signUpVerify(verifyRequest);
+    const token = response.data?.token;
 
-      return true;
-    } catch (error) {
-      throw error;
+    if (!token) {
+      throw new Error("Invalid OTP");
     }
+
+    setUserSession({ token });
+    localStorage.setItem("userSession", JSON.stringify({ token }));
+
+    return true;
   };
 
   const logout = async () => {

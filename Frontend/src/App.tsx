@@ -8,6 +8,7 @@ import { SignUp } from "./pages/SignUp";
 import { Toaster } from "@/components/ui/sonner";
 import { OAuthSuccess } from "./pages/OAuthSuccess";
 import Products from "./pages/Products";
+import CategoryPage from "./pages/CategoryPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/categories/:category" element={<CategoryPage />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
         </Routes>
         <Toaster />

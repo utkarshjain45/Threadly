@@ -28,14 +28,23 @@ export function SignIn() {
         return;
       }
 
-      const success = await login({ email, password });
-      if (success) {
-        toast.success("Login successful! Welcome to Threadly");
-        navigate("/dashboard");
-      } else {
-        toast.error("Invalid credentials. Please try again.");
-        navigate("/");
+      const result = await login({ email, password });
+      if (result.status === "pendingVerification") {
+        navigate("/signup", {
+          state: {
+            email: result.email,
+            name: result.name,
+            showOtp: true,
+            message:
+              result.message ??
+              "Complete your signup by entering the OTP sent to your email.",
+          },
+        });
+        return;
       }
+
+      toast.success("Login successful! Welcome to Threadly");
+      navigate("/");
     } catch (error) {
       toast.error("Login failed. Please check your credentials and try again.");
       console.error("Login error:", error);
@@ -96,11 +105,12 @@ export function SignIn() {
             Login
           </Button>
           <Button 
-          variant="outline" 
-          className="w-full" 
-          onClick={() => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  }}>
+            variant="outline" 
+            className="w-full" 
+            onClick={() => {
+              const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+              window.location.href = `${baseUrl}/oauth2/authorization/google`;
+            }}>
             Continue with Google
           </Button>
         </CardFooter>

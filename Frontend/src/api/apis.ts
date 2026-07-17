@@ -1,7 +1,8 @@
-import type { SignInRequest, SignUpRequest, SignUpVerifyRequest } from "@/types/auth";
+import type { LoginResponse, SignInRequest, SignUpInitResponse, SignUpRequest, SignUpVerifyRequest } from "@/types/auth";
 import axios from "axios";
 
-const api = axios.create({ baseURL: "http://localhost:8080" });
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const api = axios.create({ baseURL: API_BASE_URL });
 
 api.interceptors.request.use((config) => {
   if (config.url?.startsWith("/api/v1/auth")) {
@@ -19,13 +20,13 @@ api.interceptors.request.use((config) => {
 });
 
 export const signIn = (signInRequest: SignInRequest) =>
-  api.post("/api/v1/auth/login", signInRequest);
+  api.post<LoginResponse>("/api/v1/auth/login", signInRequest);
 
 export const signUp = (signUpRequest: SignUpRequest) =>
   api.post("/api/v1/auth/signup", signUpRequest);
 
 export const signUpInit = (signUpRequest: SignUpRequest) =>
-  api.post("/api/v1/auth/signup/init", signUpRequest);
+  api.post<SignUpInitResponse>("/api/v1/auth/signup/init", signUpRequest);
 
 export const signUpVerify = (signUpVerifyRequest: SignUpVerifyRequest) =>
   api.post("/api/v1/auth/signup/verify", signUpVerifyRequest);
@@ -33,6 +34,13 @@ export const signUpVerify = (signUpVerifyRequest: SignUpVerifyRequest) =>
 export const getUserData = () => api.get("/api/v1/users/me");
 
 export const getProductsData = () => api.get("/api/v1/products");
+
+export const getProductsByCategory = (category: string) =>
+  api.get(`/api/v1/products/category/${category}`);
+
+export const getBestSellers = () => api.get("/api/v1/products/bestsellers");
+
+export const getNewArrivals = () => api.get("/api/v1/products/new-arrivals");
 
 interface AddToCartRequest{
   productId : string;

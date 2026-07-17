@@ -1,5 +1,6 @@
 import { Button } from "./button";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 interface BannerProps {
   title: string;
@@ -37,9 +38,11 @@ export function Banner({
               {title}
             </h1>
             <p className="text-lg text-gray-200 mb-8 max-w-lg">{description}</p>
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-              {buttonText}
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Link to={buttonLink}>
+                {buttonText}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -58,7 +61,10 @@ export function CategoryBanner({
   link: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+    <Link
+      to={link}
+      className="group relative block overflow-hidden rounded-lg bg-gray-100 aspect-square"
+    >
       <img
         src={image}
         alt={title}
@@ -68,6 +74,6 @@ export function CategoryBanner({
       <div className="absolute bottom-4 left-4 right-4">
         <h3 className="text-white font-semibold text-lg">{title}</h3>
       </div>
-    </div>
+    </Link>
   );
 }

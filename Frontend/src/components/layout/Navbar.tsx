@@ -29,6 +29,7 @@ import { Button } from "../ui/button";
 import { ShoppingCart, User, Package, LogOut, Plus, Minus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/utils";
 
 type GuestCartItem = {
   productId: string;
@@ -70,10 +71,48 @@ const Navbar = () => {
       setIsCartLoading(true);
       setCartError(null);
       const response = await getCart();
-      setCart(response.data);
-    } catch (error) {
-      console.error("Failed to load cart", error);
-      setCartError("Failed to load cart. Please try again.");
+      const resData = response.data as any;
+      const cartData = resData?.data ?? resData;
+
+      if (cartData && Array.isArray(cartData.cart)) {
+        setCart(cartData);
+      } else if (Array.isArray(cartData)) {
+        setCart({
+          cart: cartData,
+          totalAmount: cartData.reduce(
+            (acc: number, item: any) => acc + (item.price ?? 0) * (item.quantity ?? 1),
+            0
+          ),
+        });
+      } else {
+        setCart({ cart: [], totalAmount: 0 });
+      }
+    } catch (error: any) {
+      console.error("Cart API load error:", error);
+
+      const status = error?.response?.status;
+      const responseData = error?.response?.data;
+      const errorMsg =
+        typeof responseData === "string"
+          ? responseData
+          : responseData?.message ?? responseData?.error ?? error?.message ?? "";
+
+      // Comprehensive checks for "cart not found" / 404 scenarios
+      const isCartNotFound =
+        status === 404 ||
+        status === 204 ||
+        String(errorMsg).toLowerCase().includes("not found") ||
+        String(errorMsg).toLowerCase().includes("cart not found") ||
+        String(errorMsg).toLowerCase().includes("no cart") ||
+        String(errorMsg).toLowerCase().includes("empty cart");
+
+      if (isCartNotFound) {
+        // Handle gracefully as empty cart
+        setCart({ cart: [], totalAmount: 0 });
+        setCartError(null);
+      } else {
+        setCartError("Failed to load cart. Please try again.");
+      }
     } finally {
       setIsCartLoading(false);
     }
@@ -202,30 +241,30 @@ const Navbar = () => {
                   Categories
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="p-4 w-48">
-                    <Link
-                      to="/categories/beauty"
-                      className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
-                    >
-                      Beauty
-                    </Link>
+                  <div className="p-3 w-56 space-y-1 bg-white rounded-lg shadow-lg border border-gray-100">
                     <Link
                       to="/categories/electronics"
-                      className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"
                     >
-                      Electronics
-                    </Link>
-                    <Link
-                      to="/categories/home-appliances"
-                      className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
-                    >
-                      Home Appliances
+                      <span>⚡</span> Electronics
                     </Link>
                     <Link
                       to="/categories/fashion"
-                      className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"
                     >
-                      Fashion
+                      <span>✨</span> Fashion
+                    </Link>
+                    <Link
+                      to="/categories/beauty"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"
+                    >
+                      <span>🌸</span> Beauty
+                    </Link>
+                    <Link
+                      to="/categories/home-appliances"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"
+                    >
+                      <span>🏠</span> Home Appliances
                     </Link>
                   </div>
                 </NavigationMenuContent>
@@ -324,8 +363,7 @@ const Navbar = () => {
                               </div>
                               <div className="flex flex-col items-end gap-2">
                                 <div className="text-right font-semibold">
-                                  ₹
-                                  {(cartItem.price * cartItem.quantity).toFixed(2)}
+                                  ₹{formatPrice(cartItem.price * cartItem.quantity)}
                                 </div>
                                 <Button
                                   variant="ghost"
@@ -401,7 +439,7 @@ const Navbar = () => {
                             </div>
                             <div className="flex flex-col items-end gap-2">
                               <div className="text-right font-semibold">
-                                ₹{(item.price * item.quantity).toFixed(2)}
+                                ₹{formatPrice(item.price * item.quantity)}
                               </div>
                               <Button
                                 variant="ghost"
@@ -422,7 +460,7 @@ const Navbar = () => {
                       <div className="flex items-center justify-between">
                         <span className="font-medium">Total</span>
                         <span className="text-lg font-semibold">
-                          ₹{cart.totalAmount.toFixed(2)}
+                          ₹{formatPrice(cart.totalAmount)}
                         </span>
                       </div>
                     </div>
@@ -432,7 +470,7 @@ const Navbar = () => {
                       <div className="flex items-center justify-between">
                         <span className="font-medium">Total</span>
                         <span className="text-lg font-semibold">
-                          ₹{getGuestCartTotal().toFixed(2)}
+                          ₹{formatPrice(getGuestCartTotal())}
                         </span>
                       </div>
                     </div>

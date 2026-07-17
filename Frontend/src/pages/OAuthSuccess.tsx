@@ -27,7 +27,7 @@ export function OAuthSuccess() {
       await setOAuthSession(token);
 
       toast.success("Google login successful!");
-      navigate("/dashboard");
+      navigate("/");
     };
 
     handleOAuth();
