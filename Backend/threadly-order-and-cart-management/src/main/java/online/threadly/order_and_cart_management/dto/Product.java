@@ -17,4 +17,20 @@ public class Product {
     private Double price;
 
     private Integer quantity;
+
+    private String category;
+
+    private String subcategory;
+
+    private String color;
+
+    private String size;
+
+    private Double originalPrice;
+
+    private Double discount;
+
+    private boolean bestSeller;
+
+    private boolean newArrival;
 }

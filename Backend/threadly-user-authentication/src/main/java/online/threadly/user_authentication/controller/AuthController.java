@@ -2,10 +2,11 @@ package online.threadly.user_authentication.controller;
 
 import lombok.AllArgsConstructor;
 import online.threadly.user_authentication.dao.AuthResponse;
+import online.threadly.user_authentication.dao.LoginResponse;
 import online.threadly.user_authentication.dao.SignInRequest;
+import online.threadly.user_authentication.dao.SignUpInitResponse;
 import online.threadly.user_authentication.dao.SignUpRequest;
 import online.threadly.user_authentication.dao.VerifyOTPRequest;
-import online.threadly.user_authentication.model.User;
 import online.threadly.user_authentication.service.AuthService;
 import online.threadly.user_authentication.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class AuthController {
     private final EmailService emailService;
 
     @PostMapping("/signup/init")
-    public ResponseEntity<String> sendEmail(@RequestBody SignUpRequest signUpRequest){
+    public ResponseEntity<SignUpInitResponse> sendEmail(@RequestBody SignUpRequest signUpRequest){
         return ResponseEntity.ok(emailService.generateEmail(signUpRequest));
     }
 
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@RequestBody SignInRequest signInRequest){
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody SignInRequest signInRequest){
         return ResponseEntity.ok(authService.authenticate(signInRequest));
     }
 }

@@ -43,7 +43,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.deleteItemFromCart(userId, productId));
     }
 
-    @PostMapping("/item")
+    @PutMapping("/item")
     public ResponseEntity<AddToCartResponse> updateCartItemQuantity(@RequestHeader("X-USER-ID") UUID userId, @RequestBody AddToCartRequest request){
         return ResponseEntity.ok(cartService.updateCartItemQuantity(userId, request));
     }

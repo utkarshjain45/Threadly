@@ -1,6 +1,7 @@
 package online.threadly.product.service;
 
 import lombok.AllArgsConstructor;
+import online.threadly.product.model.Category;
 import online.threadly.product.model.Product;
 import online.threadly.product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,18 @@ public class ProductService {
 
     public Product getProductBySlug(String slug){
         return productRepository.findBySlug(slug).orElse(null);
+    }
+
+    public List<Product> getProductsByCategory(Category category){
+        return productRepository.findByCategory(category);
+    }
+
+    public List<Product> getBestSellers(){
+        return productRepository.findByBestSellerTrue();
+    }
+
+    public List<Product> getNewArrivals(){
+        return productRepository.findByNewArrivalTrue();
     }
 
     public List<Product> getProductsByProductIds(List<UUID> productIds){

@@ -36,6 +36,23 @@ public class Product {
 
     private boolean isFeatured;
 
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
+    private String subcategory;
+
+    private String color;
+
+    private String size;
+
+    private Double originalPrice;
+
+    private Double discount;
+
+    private boolean bestSeller;
+
+    private boolean newArrival;
+
     private LocalDateTime createdAt;
 
     @PrePersist

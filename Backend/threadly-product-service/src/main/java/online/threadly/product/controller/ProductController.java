@@ -1,6 +1,7 @@
 package online.threadly.product.controller;
 
 import online.threadly.product.dao.Response;
+import online.threadly.product.model.Category;
 import online.threadly.product.model.Product;
 import online.threadly.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,29 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response("product not found", null));
         }
         return ResponseEntity.ok(new Response("product fetched successfully", product));
+    }
+
+    @GetMapping("/products/category/{category}")
+    public ResponseEntity<Response> getProductsByCategory(@PathVariable String category){
+        try {
+            Category catEnum = Category.valueOf(category.toUpperCase().replace("-", "_").replace(" ", "_"));
+            List<Product> products = productService.getProductsByCategory(catEnum);
+            return ResponseEntity.ok(new Response("products fetched successfully", products));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response("Invalid Category", null));
+        }
+    }
+
+    @GetMapping("/products/bestsellers")
+    public ResponseEntity<Response> getBestSellers(){
+        List<Product> products = productService.getBestSellers();
+        return ResponseEntity.ok(new Response("bestsellers fetched successfully", products));
+    }
+
+    @GetMapping("/products/new-arrivals")
+    public ResponseEntity<Response> getNewArrivals(){
+        List<Product> products = productService.getNewArrivals();
+        return ResponseEntity.ok(new Response("new arrivals fetched successfully", products));
     }
 
     @PostMapping("/products/bulk")
