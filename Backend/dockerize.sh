@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Your Docker Hub username
-USERNAME="utkarshjain45"
+USERNAME="${DOCKER_USERNAME}"
 
 # List of services (you can modify this anytime)
 SERVICES=(
@@ -21,7 +21,10 @@ for SERVICE in "${SERVICES[@]}"; do
   cd "$SERVICE" || { echo "Directory $SERVICE not found! Skipping..."; continue; }
 
   # Build
-  docker buildx build -t "$USERNAME/$SERVICE" .
+  docker buildx build \
+    --platform linux/amd64 \
+    -t "$USERNAME/$SERVICE:latest" \
+    --push .
 
   # Push
   docker push "$USERNAME/$SERVICE"
