@@ -64,3 +64,6 @@ application-local.yml
 #docker
 
 .dockerignore
+
+docker-compose.yml
+prod-data.sql

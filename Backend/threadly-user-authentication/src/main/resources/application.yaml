@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: threadly-user-authentication
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  sql:
+    init:
+      mode: never
+
+server:
+  port: ${PORT:8081}
+
+spring.security.oauth2.client.provider.google.authorization-uri: "https://accounts.google.com/o/oauth2/v2/auth?prompt=select_account"
+
+eureka:
+  client:
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10

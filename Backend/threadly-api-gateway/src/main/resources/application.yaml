@@ -1,0 +1,58 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: threadly-api-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  cloud:
+    gateway:
+      enabled: true
+      discovery:
+        locator:
+          enabled: true
+      default-filters:
+        - RemoveResponseHeader=Access-Control-Allow-Origin
+        - RemoveResponseHeader=Access-Control-Allow-Credentials
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin, RETAIN_FIRST
+      routes:
+        - id: threadly-user-authentication-service-public-routes
+          uri: lb://threadly-user-authentication
+          predicates:
+            - Path=/api/v1/auth/**
+
+        - id: threadly-user-authentication-service-private-routes
+          uri: lb://threadly-user-authentication
+          predicates:
+            - Path=/api/v1/users/**
+
+        - id: threadly-user-authentication-service-oauth-routes
+          uri: lb://threadly-user-authentication
+          predicates:
+            - Path=/oauth2/**,/login/**
+
+        - id: threadly-product-service-public-routes
+          uri: lb://threadly-product-service
+          predicates:
+            - Path=/api/v1/products/**
+
+        - id: threadly-product-service-private-admin-routes
+          uri: lb://threadly-product-service
+          predicates:
+            - Path=/api/v1/admin/products/**
+          filters:
+            - RequireAdminRoleFilter
+
+        - id: threadly-order-and-cart-management-service-public-routes
+          uri: lb://threadly-order-and-cart-management
+          predicates:
+            - Path=/api/v1/cart/**
+
+eureka:
+  client:
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
