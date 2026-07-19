@@ -26,9 +26,6 @@ for SERVICE in "${SERVICES[@]}"; do
     -t "$USERNAME/$SERVICE:latest" \
     --push .
 
-  # Push
-  docker push "$USERNAME/$SERVICE"
-
   # Return to backend root folder
   cd ..
 done

@@ -23,9 +23,11 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Make script executable
-        run: chmod +x build-and-push.sh
+        working-directory: Backend
+        run: chmod +x dockerize.sh
 
       - name: Build and Push Images
+        working-directory: Backend
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: ./dockerize.sh
