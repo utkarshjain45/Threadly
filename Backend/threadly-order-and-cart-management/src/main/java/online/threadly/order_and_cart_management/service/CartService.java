@@ -51,7 +51,14 @@ public class CartService {
     }
 
     public CartResponse getCartForUser(UUID userId) {
-        Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("Cart Not Found"));
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+
+        if (cart == null) {
+            CartResponse emptyCartResponse = new CartResponse();
+            emptyCartResponse.setCart(new ArrayList<>());
+            emptyCartResponse.setTotalAmount(0.0);
+            return emptyCartResponse;
+        }
 
         List<CartItem> items = cartItemRepository.findAllByCartId(cart.getId());
         List<UUID> productIds = items.stream().map(CartItem::getProductId).toList();
