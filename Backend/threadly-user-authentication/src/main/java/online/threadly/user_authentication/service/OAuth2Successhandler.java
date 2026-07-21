@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 
@@ -19,6 +20,9 @@ public class OAuth2Successhandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+
+    @Value("${FRONTEND_OAUTH_SUCCESS_URL:https://threadly.works/oauth-success}")
+    private String frontendOauthSuccessUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -39,8 +43,6 @@ public class OAuth2Successhandler implements AuthenticationSuccessHandler {
         }
         String token = jwtService.generateToken(user);
 
-        response.sendRedirect(
-                "http://localhost:5173/oauth-success?token=" + token
-        );
+        response.sendRedirect(frontendOauthSuccessUrl + "?token=" + token);
     }
 }
