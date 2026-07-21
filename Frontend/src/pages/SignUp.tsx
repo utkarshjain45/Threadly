@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { normalizeBaseUrl } from "@/lib/utils";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -228,7 +229,7 @@ export function SignUp() {
                 variant="outline" 
                 className="w-full" 
                 onClick={() => {
-                  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+                  const baseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL, "http://localhost:8080");
                   window.location.href = `${baseUrl}/oauth2/authorization/google`;
                 }}>
                 Continue with Google

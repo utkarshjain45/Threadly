@@ -3,7 +3,6 @@ package online.threadly.user_authentication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +10,6 @@ import java.io.FileReader;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@CrossOrigin
 public class Application {
 
 	public static void main(String[] args) {

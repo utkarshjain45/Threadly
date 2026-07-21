@@ -11,3 +11,7 @@ export function formatPrice(amount: number): string {
     ? amount.toLocaleString("en-IN")
     : amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+export function normalizeBaseUrl(baseUrl: string | undefined, fallback: string): string {
+  return (baseUrl || fallback).replace(/\/$/, "");
+}

@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
 @EnableMethodSecurity(prePostEnabled = true)
 @RequestMapping("/api/v1/users")
 public class UserController {
