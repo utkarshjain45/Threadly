@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 
-@FeignClient(name = "threadly-order-and-cart-management", url = "http://localhost:8084/api/v1")
+@FeignClient(name = "threadly-order-and-cart-management", url = "${ORDER_SERVICE_URL:http://localhost:8084/api/v1}")
 public interface OrderClient {
 
     @PutMapping("/orders/{orderId}/confirm")
