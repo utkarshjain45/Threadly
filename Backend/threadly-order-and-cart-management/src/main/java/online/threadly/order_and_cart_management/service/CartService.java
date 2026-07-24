@@ -1,6 +1,5 @@
 package online.threadly.order_and_cart_management.service;
 
-import jakarta.ws.rs.BadRequestException;
 import lombok.AllArgsConstructor;
 import online.threadly.order_and_cart_management.client.ProductClient;
 import online.threadly.order_and_cart_management.dto.*;

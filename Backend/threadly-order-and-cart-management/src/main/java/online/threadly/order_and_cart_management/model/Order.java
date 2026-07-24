@@ -1,7 +1,6 @@
 package online.threadly.order_and_cart_management.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;

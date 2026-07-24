@@ -3,7 +3,6 @@ package online.threadly.user_authentication.service;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import online.threadly.user_authentication.model.User;
 import online.threadly.user_authentication.repository.UserRepository;
 import org.springframework.security.core.Authentication;

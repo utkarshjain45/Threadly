@@ -1,6 +1,5 @@
 package online.threadly.order_and_cart_management.repository;
 
-import online.threadly.order_and_cart_management.model.Cart;
 import online.threadly.order_and_cart_management.model.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
