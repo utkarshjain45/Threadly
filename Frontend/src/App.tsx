@@ -9,6 +9,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { OAuthSuccess } from "./pages/OAuthSuccess";
 import Products from "./pages/Products";
 import CategoryPage from "./pages/CategoryPage";
+import Cart from "./pages/Cart";
+import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -20,9 +23,13 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/categories/:category" element={<CategoryPage />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
         </Routes>
+
         <Toaster />
       </BrowserRouter>
     </AuthProvider>

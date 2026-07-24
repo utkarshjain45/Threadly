@@ -72,3 +72,82 @@ export const removeItemFromCart = (productId: string) =>
 
 export const updateCartItemQuantity = (payload: AddToCartRequest) => 
   api.put("api/v1/cart/item", payload);
+
+export interface OrderResponse {
+  orderId: string;
+  amount: number;
+  orderStatus: string;
+}
+
+export interface CreatePaymentOrderRequest {
+  orderId: string;
+  amount: number;
+}
+
+export interface CreatePaymentOrderResponse {
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
+  orderId: string;
+}
+
+export interface VerifyPaymentRequest {
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  orderId: string;
+  cartItemIds: string[];
+}
+
+export interface VerifyPaymentResponse {
+  status: string;
+  message: string;
+  orderId: string;
+}
+
+export const checkoutOrder = (cartItemIds: string[]) =>
+  api.post<OrderResponse>("/api/v1/orders/checkout", cartItemIds);
+
+export const createPaymentOrder = (payload: CreatePaymentOrderRequest) =>
+  api.post<CreatePaymentOrderResponse>("/api/v1/payments/create-order", payload);
+
+export const verifyPayment = (payload: VerifyPaymentRequest) =>
+  api.post<VerifyPaymentResponse>("/api/v1/payments/verify", payload);
+
+export interface OrderItemDTO {
+  id: string;
+  productId: string;
+  productName: string;
+  images: string[];
+  price: number;
+  quantity: number;
+}
+
+export interface OrderHistoryResponse {
+  id: string;
+  totalAmount: number;
+  orderStatus: string;
+  createdAt: string;
+  items: OrderItemDTO[];
+}
+
+export const getUserOrders = () =>
+  api.get<OrderHistoryResponse[]>("/api/v1/orders");
+
+export interface UserProfileUpdate {
+  name?: string;
+  phone?: string;
+  address?: string;
+}
+
+export const updateUserProfile = (payload: UserProfileUpdate) =>
+  api.put("/api/v1/users/profile", payload);
+
+export interface PasswordUpdateRequest {
+  oldPassword?: string;
+  newPassword?: string;
+}
+
+export const updateUserPassword = (payload: PasswordUpdateRequest) =>
+  api.put("/api/v1/users/password", payload);

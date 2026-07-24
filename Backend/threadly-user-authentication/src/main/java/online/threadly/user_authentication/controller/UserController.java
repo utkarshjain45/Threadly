@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import online.threadly.user_authentication.dao.PasswordUpdateRequest;
+
 @RestController
 @EnableMethodSecurity(prePostEnabled = true)
 @RequestMapping("/api/v1/users")
@@ -35,5 +37,20 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateProfile(@RequestBody User updateDetails) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateProfile(currentUser.getId(), updateDetails));
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<String> updatePassword(@RequestBody PasswordUpdateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        userService.updatePassword(currentUser.getId(), request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok("Password updated successfully");
     }
 }

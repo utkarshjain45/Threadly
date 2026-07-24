@@ -66,4 +66,5 @@ application-local.yml
 .dockerignore
 
 docker-compose.yml
+docker-compose-prod.yml
 prod-data.sql

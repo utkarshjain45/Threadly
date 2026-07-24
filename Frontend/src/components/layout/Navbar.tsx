@@ -456,26 +456,37 @@ const Navbar = () => {
                     )}
                   </div>
                   {isAuthenticated && cart && (
-                    <div className="shrink-0 border-t bg-background px-6 py-4">
+                    <div className="shrink-0 border-t bg-background px-6 py-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="font-medium">Total</span>
                         <span className="text-lg font-semibold">
                           ₹{formatPrice(cart.totalAmount)}
                         </span>
                       </div>
+                      <Link to="/cart" onClick={() => setIsCartOpen(false)} className="block w-full">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                          View Full Cart & Checkout
+                        </Button>
+                      </Link>
                     </div>
                   )}
                   {!isAuthenticated && guestCart.length > 0 && (
-                    <div className="shrink-0 border-t bg-background px-6 py-4">
+                    <div className="shrink-0 border-t bg-background px-6 py-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="font-medium">Total</span>
                         <span className="text-lg font-semibold">
                           ₹{formatPrice(getGuestCartTotal())}
                         </span>
                       </div>
+                      <Link to="/cart" onClick={() => setIsCartOpen(false)} className="block w-full">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                          View Full Cart & Checkout
+                        </Button>
+                      </Link>
                     </div>
                   )}
                 </div>
+
               </SheetContent>
             </Sheet>
             {isAuthenticated ? (
